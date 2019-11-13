@@ -1,7 +1,7 @@
 ## TODO:
 
 - In order to do association rule mining, we have to:
-  - Write a program to convert continuous attributes into binary nominal attributes
+  - ~~Write a program to convert continuous attributes into binary nominal attributes~~ done
   - Then use weka to generate association rules
   - Use a regex to parse the association rules
   - Use the parsed association rules to figure out which conditions should be dropped (clopper pearson or y1 y2 e1 e2)
