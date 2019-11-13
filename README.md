@@ -1,7 +1,20 @@
 ## TODO:
 
+- In order to do association rule mining, we have to:
+  - Write a program to convert continuous attributes into binary nominal attributes
+  - Then use weka to generate association rules
+  - Use a regex to parse the association rules
+  - Use the parsed association rules to figure out which conditions should be dropped (clopper pearson or y1 y2 e1 e2)
+  - Mabye repeat only for rows where is_attack = 0 and see if those rules hold for is_attack = 1
+
+- Clustering
+- SVMs
+- Decision Trees
+- Ensemble of all models we've built so far
 
 ## NOTES FROM CLASS:
+
+We need to use ensemble methods. Leopold also mentioned SVMs and Decision Trees.
 
 Primarily interested in being able to detect attacks ("they didn't just attack one thing at a time; sometimes 2 or 3 things."
 
