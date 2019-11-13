@@ -7,10 +7,13 @@
   - Use the parsed association rules to figure out which conditions should be dropped (clopper pearson or y1 y2 e1 e2)
   - Mabye repeat only for rows where is_attack = 0 and see if those rules hold for is_attack = 1
 
+- PRISM? (weka can do this and use it in an ensemble classifier, but I don't think R can)
 - Clustering
 - SVMs
-- Decision Trees
+- Decision Trees (kd tree)
+- Baysian Networks, if not too complicated
 - Ensemble of all models we've built so far
+- Cross validation on the ensemble models (or individual models if they turn out to be better than ensemble)
 
 ## NOTES FROM CLASS:
 
