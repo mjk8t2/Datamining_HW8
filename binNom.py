@@ -64,7 +64,9 @@ for column in df_continuous_colnames:
   df.loc[df[column] > best_partition,column] = "GT"
   df = df.replace(keynum, "LT")
 
-df.to_csv("binNomified.csv")
+
+df = df.replace(0, "zero").replace(1, "one").replace(2, "two") # make them nominal for weka
+df.to_csv("binNomified.csv",index=False)
 
   # break
 
