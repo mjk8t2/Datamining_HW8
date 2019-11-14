@@ -8,6 +8,7 @@
   - Mabye repeat only for rows where is_attack = 0 and see if those rules hold for is_attack = 1
 
 - PRISM? (weka can do this and use it in an ensemble classifier, but I don't think R can)
+  - Weka is advised for adaBoost rather than R - look into this
 - Clustering
 - SVMs
 - Decision Trees (kd tree)
