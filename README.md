@@ -6,7 +6,22 @@
   - Use a regex to parse the association rules
   - Use the parsed association rules to figure out which conditions should be dropped (clopper pearson or y1 y2 e1 e2)
   - Mabye repeat only for rows where is_attack = 0 and see if those rules hold for is_attack = 1
+  
+### Reorganization of models
+- Kd tree - chau - use decision tree for -> adaBoost 
+  - weka
+- Clusterings - sujit
+  - kmeans 
+  - nearest neighbors
+  - dbscan
+- regression
+- SVMs
+- PRISM 
+- Baysian Networks
+- Ensemble
+- Cross validation
 
+### old list
 - PRISM? (weka can do this and use it in an ensemble classifier, but I don't think R can)
   - Weka is advised for adaBoost rather than R - look into this
 - Clustering
