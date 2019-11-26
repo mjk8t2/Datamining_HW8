@@ -1,155 +1,157 @@
-import pandas as pd
-import numpy as np
-from sklearn.cluster import dbscan
-import math
-
-# https://www.datacamp.com/community/tutorials/adaboost-classifier-python
-
-df = pd.read_csv("hw8_data.csv")
-# df.nunique().to_csv("nunique_init.csv")
-
-print(df.MV301.value_counts().sort_index()) # proc freq
-
-# for MV#0#:
-# 0 => in transition
-# 1 => closed
-# 2 => open
 
 
+############
+# ADABOOST #
+############
+# import pandas
+# import numpy
+# from sklearn.ensemble import AdaBoostClassifier
+# from sklearn.tree import DecisionTreeClassifier
+# from sklearn.model_selection import train_test_split
+# from sklearn import metrics
+# from sklearn.metrics import confusion_matrix
 
 
+# df = pandas.read_csv("hw8_data.csv")
 
+# Y = df["is_attack"]
+# X = df[[column for column in df if df.nunique()[column] >= 4]].astype(float)
 
+# X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.33, random_state=0)
 
+# print("classifying...")
+# classifier = AdaBoostClassifier(DecisionTreeClassifier(max_depth = None), n_estimators = 200) 
+# classifier.fit(X_train, Y_train)
 
-# old code
+# y_pred = classifier.predict(X_test)
 
+# print('Mean Absolute Error:', metrics.mean_absolute_error(Y_test, y_pred))
+# cf = confusion_matrix(Y_test, y_pred)
+# print(cf)
 
-# ######################################################
-# # remove the timestamps column because it is useless #
-# ######################################################
-# df = df.drop(columns="timestamps")
+############
+# STACKING #
+############
+import numpy
+import pandas
+import subprocess
+import sklearn
+from sklearn import model_selection
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
+from mlxtend.classifier import StackingClassifier
+from sklearn.tree import export_graphviz
+from sklearn.metrics import confusion_matrix
 
-# #################################################################################
-# # convert the "y's" and "n's" in the is_attack column to 2s and 1s respectively #
-# #################################################################################
-# df['is_attack'] = df['is_attack'].map({"0":"1", "1":"2", "N":"1", "Y":"2"})
+# import matplotlib.pyplot as plt
+# from mlxtend.plotting import plot_decision_regions
+# import matplotlib.gridspec as gridspec
+# import itertools
+# gs = gridspec.GridSpec(2, 2)
+# fig = plt.figure(figsize=(10,8))
 
-# ###########################################################
-# # replace all "almost" values with "full" values in MV#0# #
-# ###########################################################
-# cc = "1" # 1 => closed
-# oo = "2" # 2 => open
+numpy.set_printoptions(suppress=True) # supress scientific notation
+import warnings
+warnings.filterwarnings('ignore')
 
-# df = df.replace("ALMOST_CLOSD", "ALMOST_CLOSED") # only MV304 has a typo
+df = pandas.read_csv("hw8_data.csv")
 
-# # based on the grouping attributes entropy, we found that replacing these leads to lower entropy (higher info gain)
-# df['MV304'] = df['MV304'].map({"CLOSED":cc, "OPEN":oo, "ALMOST_CLOSED":cc, "SEMI_CLOSED":cc, "ALMOST_OPEN":oo, "SEMI_OPEN":oo})
-# df['MV301'] = df['MV301'].map({"CLOSED":cc, "OPEN":oo, "ALMOST_CLOSED":cc, "SEMI_CLOSED":cc, "ALMOST_OPEN":oo, "SEMI_OPEN":oo})
-# df['MV302'] = df['MV302'].map({"CLOSED":cc, "OPEN":oo, "ALMOST_CLOSED":cc, "SEMI_CLOSED":cc, "ALMOST_OPEN":oo, "SEMI_OPEN":oo})
-# df['MV101'] = df['MV101'].map({"CLOSED":cc, "OPEN":oo, "ALMOST_CLOSED":cc, "SEMI_CLOSED":cc, "ALMOST_OPEN":oo, "SEMI_OPEN":oo})
-# df['MV201'] = df['MV201'].map({"CLOSED":cc, "OPEN":oo, "ALMOST_CLOSED":cc, "SEMI_CLOSED":cc, "ALMOST_OPEN":oo, "SEMI_OPEN":oo})
-# df['MV303'] = df['MV303'].map({"CLOSED":cc, "OPEN":oo, "ALMOST_CLOSED":cc, "SEMI_CLOSED":cc, "ALMOST_OPEN":oo, "SEMI_OPEN":oo})
-# # print(df.MV301.value_counts().sort_index()) # proc freq
+clf1 = KNeighborsClassifier(n_neighbors=1)
+clf2 = RandomForestClassifier(random_state=1)
+clf3 = GaussianNB()
+clf4 = DecisionTreeClassifier(max_depth = None)
+lr = LogisticRegression()
+sclf = StackingClassifier(classifiers=[clf1, clf2, clf4], meta_classifier=lr) # Create the ensemble classifier
 
-# ###############################################################################
-# # drop all columns with only one unique value (those columns tell us nothing) #
-# ############################################################################### 
-# columns_to_drop = [column for column in df if df.nunique()[column] == 1]
-# df = df.drop(columns=columns_to_drop)
+# # mod1 = DecisionTreeClassifier(max_depth = 1)
+# # mod2 = DecisionTreeClassifier(max_depth = 2)
+# # mod3 = DecisionTreeClassifier(max_depth = 3)
+# # mod4 = DecisionTreeClassifier(max_depth = 4)
+# # mod5 = DecisionTreeClassifier(max_depth = 5)
+# # modNone = DecisionTreeClassifier(max_depth = None)
+# # sclf = StackingClassifier(classifiers=[mod1, mod2, mod3, mod4, mod5, modNone], meta_classifier=lr) # Create the ensemble classifier
 
-# ######################################
-# # replace NAs with most common value #
-# ######################################
-# # df = df.dropna() # this throws out around 12,000 rows!
-# # df.to_csv("out2.csv")
-# df = df.fillna(df.mode().iloc[0]) # https://stackoverflow.com/a/32619781
-
-# ########################################################################################
-# # convert 1s and 2s to zeros and ones so weka automatically interprets them as nominal #
-# ########################################################################################
-# def conv(x):
-#   if x == "1":
-#     return "zero"
-#   if x == "2":
-#     return "one"
+# num_folds = 5
+# folds = {ii:[] for ii in range(num_folds)}
+# yatk_count = 0
+# natk_count = 0
+# for index, row in df.iterrows():
+#   if row["is_attack"] == 0:
+#     folds[natk_count].append(index)
+#     natk_count += 1
 #   else:
-#     return x
-# df = df.applymap(conv) # i used 1 and 2 originally so that only the categorical attributes are affected at this stage (there are no continuous variables with values of exactly 1 or 2, but there are some with values of 0)
+#     folds[yatk_count].append(index)
+#     yatk_count += 1
+#   natk_count %= num_folds
+#   yatk_count %= num_folds
 
-# #########################
-# # remove duplicate rows #
-# #########################
-# # duplicated = df[df.duplicated(keep=False)]
-# # print(duplicated)
-# df = df.drop_duplicates()
+# # for clf, label in zip([mod1, mod2, mod3, mod4, mod5, modNone], ['mod1', 'mod2', 'mod3', 'mod4', 'mod5', 'modNone']):  
+# for clf, label in zip([clf1, clf2, clf4, sclf], ['KNN', 'Random Forest', 'DecisionTree', 'StackingClassifier']):
+#   print("Confusion matrices for {}".format(label))
+#   all_conf_matrices = []
+#   for key, val in folds.items():
+#     test = df.iloc[val]
+#     train = df.drop(val, axis = 0)
+  
+#     Y_test, Y_train = test["is_attack"], train["is_attack"]
+#     cols = [column for column in df if df.nunique()[column] >= 4]
+#     X_test, X_train = test[cols].astype(float), train[cols].astype(float)
 
-# ############################################################################
-# # fix entries which are off by multiples of ten (clearly a recording error #
-# ############################################################################
-# df_discrete_colnames = [column for column in df if df.nunique()[column] < 3]
-# df_continuous_colnames = [column for column in df if df.nunique()[column] >= 3]
+#     clf.fit(X_train, Y_train)
+#     # sklearn.tree.plot_tree(clf)
+#     # export_graphviz(clf, out_file = "trees/tree{}_{}.dot".format(label, key))
+#     # subprocess.call("dot -Tpng tree.dot -o out.png")
+#     # (graph,) = pydot.graph_from_dot_file('tree.dot')
+#     conf = confusion_matrix(Y_test, clf.predict(X_test))
+#     all_conf_matrices.append(conf)
 
-# # some values are excessively large in the dataframe, throwing off the averages
-# # example: 931.6713 for AIT202 at row 14591
-# # example: fit301 has values that are orders of magnitude off: 0.0512443, 0.000512443, 0.00000512443
-# def fix_mags(colnames):
-#   def magnitude(value): # https://stackoverflow.com/a/52335468
-#     if value == 0: 
-#       return 0
-#     return int(math.floor(math.log10(abs(value))))
+#   avg_confus_matrix = all_conf_matrices[0]
+#   for ii in range(1, len(all_conf_matrices)):
+#     avg_confus_matrix = numpy.add(avg_confus_matrix, all_conf_matrices[ii])
+#   avg_confus_matrix = (avg_confus_matrix/len(all_conf_matrices))
+#   print(avg_confus_matrix)
+#   print("-"*80)
 
-#   for ind, colname in enumerate(colnames):
-#     dist = {ii:0 for ii in range(-10, 10)} # dict acting as a distribution of the orders of magnitude
-#     for index, row in df.iterrows():
-#       dist[magnitude(float(row[colname]))] += 1
-      
-#     dist_list = sorted(dist.items(), key=lambda x: x[1], reverse=True) # the most common order of magnitude is now listed first
-    
-#     for index, row in df.iterrows():
-#       mag = magnitude(float(row[colname]))
-#       if mag != dist_list[0][0]: # if the order of magintude is not the most common order of magnitude, then fix it
-#         df.loc[index, colname] = float(row[colname])*10**(dist_list[0][0]-mag)
-#     print("Fixed orders of magnitude for {} (Col {}/{})".format(colname, ind+1, len(colnames)))
 
-# fix_mags(df_continuous_colnames)
+print("Wait while graph displays being prepared...\n")
+y = df["is_attack"].to_numpy()
+# X = df[["AIT201", "AIT202"]].to_numpy()
+# X = df[["AIT203", "LIT301"]].to_numpy()
+# cols = ["PIT502", "PIT503"]
+cols = ["AIT201", "AIT202"]
+cols = ["AIT203", "LIT301"]
+X = df[cols].to_numpy()
 
-# ###############################################################################
-# # create output files that we will use outside of Python (such as Weka and R) #
-# ###############################################################################
-# df_discrete = df[df_discrete_colnames] # these are already interpreted as strings
-# df_continuous = df[df_continuous_colnames].astype(float)
-# df_discrete.to_csv("df_discrete.csv", index=False)
-# df_continuous.to_csv("df_continuous.csv", index=False)
-# df_continuous.corr(method="pearson").to_csv("pearson_correlations.csv")
-# df_continuous.corr(method="spearman").to_csv("spearman_correlations.csv")
-# df.to_csv("USE THIS DATASET FOR PCA, CHI SQUARE, AND APRIORI.csv")
 
-# ########################################################################################
-# # remove attributes determined unecessary by apriori, pca, chi square, and correlation #
-# ########################################################################################
-# # based on the results from Weka and R, we will then decide which attributes to drop here
-# # drop MV301 and MV302 (p values from chi square were nearly zero when tested for indep against MV303)
-# df = df.drop(columns=["MV301", "MV303", "AIT203", "FIT501", "FIT502", "FIT503", "P401"])
+# X = df[["AIT201", "AIT202", "LIT301"]].to_numpy()
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+from mlxtend.plotting import plot_decision_regions
+import matplotlib.gridspec as gridspec
+import itertools
 
-# ###################
-# # remove outliers #
-# ###################
-# df_discrete_colnames = [column for column in df if df.nunique()[column] < 3]
-# df_continuous_colnames = [column for column in df if df.nunique()[column] >= 3]
-# df_discrete = df[df_discrete_colnames] # these are already interpreted as strings
-# df_continuous = df[df_continuous_colnames].astype(float)
-# # from scipy import stats
-# # df_continuous = df_continuous[(np.abs(stats.zscore(df_continuous)) < 3).all(axis=1)] # throw out all rows where at least one continuous attribute is not within three standard deviations of the mean
-# df_continuous_normalized = df_continuous.apply(lambda x: x/x.max(), axis=1) # divide each column by its maximum value
+pca = PCA(n_components = 2)
+cols = [column for column in df if df.nunique()[column] >= 4]
+X2 = df[cols].astype(float)
+X2 = pca.fit_transform(X2)
 
-# print("Starting dbscan...")
-# cores, labels = dbscan(df_continuous_normalized, eps = 0.5, min_samples = 150)
-# df_continuous["classification"] = list(labels[:]) # add the dbscan classification column to the dataset
-# df_continuous = df_continuous.loc[df_continuous["classification"] != -1].drop(columns="classification") # eliminate all the noise points determined by dbscan
-# df = df_discrete.join(df_continuous, how="inner") # put the two back together, throwing out all rows in df_discrete that don't have a corresponding row in df_continuous
+clf4.fit(X2, y)
+fig = plt.figure(figsize=(10,8))
+fig = plot_decision_regions(X=X2, y=y, clf=clf4)
+plt.xlabel(cols[0])
+plt.ylabel(cols[1])
+plt.title("Decision Tree")
 
-# #####################################
-# # output the final, cleaned dataset #
-# #####################################
-# df.to_csv("cleaned_df.csv")
+# gs = gridspec.GridSpec(2, 2)
+# fig = plt.figure(figsize=(10,8))
+# for clf, lab, grd in zip([clf1, clf2, clf4, sclf], ['KNN', 'Random Forest', 'DecisionTree', 'StackingClassifier'], itertools.product([0, 1], repeat=2)):
+#   clf.fit(X, y)
+#   ax = plt.subplot(gs[grd[0], grd[1]])
+#   fig = plot_decision_regions(X=X, y=y, clf=clf)
+#   plt.xlabel(cols[0])
+#   plt.ylabel(cols[1])
+#   plt.title(lab)
+plt.show()
