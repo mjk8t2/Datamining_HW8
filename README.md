@@ -2,10 +2,11 @@
 
 - In order to do association rule mining, we have to:
   - ~~Write a program to convert continuous attributes into binary nominal attributes~~ done
-  - Then use weka to generate association rules
-  - Use a regex to parse the association rules
-  - Use the parsed association rules to figure out which conditions should be dropped (clopper pearson or y1 y2 e1 e2)
-  - Mabye repeat only for rows where is_attack = 0 and see if those rules hold for is_attack = 1
+  - ~~Then use weka to generate association rules~~
+  - ~~Use a regex to parse the association rules~~
+  - Use the parsed association rules to figure out which conditions should be dropped (clopper pearson or y1 y2 e1 e2) (need to do decision tree pruning)
+  - Document all Weka settings used as well as results from those models
+  - Build an ensemble classifier using the best methods we've found and use cross validation to avoid overfitting
   
 ### Reorganization of models
 - Kd tree - chau - use decision tree for -> adaBoost 

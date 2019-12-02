@@ -1,0 +1,28 @@
+digraph Tree {
+node [shape=box, style="filled", color="black"] ;
+0 [label="AIT201 <= 128.509\ngini = 0.225\nsamples = 10498\nvalue = [9142, 1356]\nclass = No", fillcolor="#e99456"] ;
+1 [label="AIT203 <= 235.991\ngini = 0.499\nsamples = 2282\nvalue = [1195, 1087]\nclass = No", fillcolor="#fdf4ed"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label="LIT301 <= 923.421\ngini = 0.136\nsamples = 560\nvalue = [41, 519]\nclass = Yes", fillcolor="#49a5e7"] ;
+1 -> 2 ;
+3 [label="gini = 0.0\nsamples = 41\nvalue = [41, 0]\nclass = No", fillcolor="#e58139"] ;
+2 -> 3 ;
+4 [label="gini = 0.0\nsamples = 519\nvalue = [0, 519]\nclass = Yes", fillcolor="#399de5"] ;
+2 -> 4 ;
+5 [label="DPIT301 <= 1.26\ngini = 0.442\nsamples = 1722\nvalue = [1154, 568]\nclass = No", fillcolor="#f2bf9a"] ;
+1 -> 5 ;
+6 [label="gini = 0.5\nsamples = 972\nvalue = [473, 499]\nclass = Yes", fillcolor="#f5fafe"] ;
+5 -> 6 ;
+7 [label="gini = 0.167\nsamples = 750\nvalue = [681, 69]\nclass = No", fillcolor="#e88e4d"] ;
+5 -> 7 ;
+8 [label="AIT402 <= 6.678\ngini = 0.063\nsamples = 8216\nvalue = [7947, 269]\nclass = No", fillcolor="#e68540"] ;
+0 -> 8 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+9 [label="AIT202 <= 9.396\ngini = 0.294\nsamples = 1501\nvalue = [1232, 269]\nclass = No", fillcolor="#eb9d64"] ;
+8 -> 9 ;
+10 [label="gini = 0.182\nsamples = 1355\nvalue = [1218, 137]\nclass = No", fillcolor="#e88f4f"] ;
+9 -> 10 ;
+11 [label="gini = 0.173\nsamples = 146\nvalue = [14, 132]\nclass = Yes", fillcolor="#4ea7e8"] ;
+9 -> 11 ;
+12 [label="gini = 0.0\nsamples = 6715\nvalue = [6715, 0]\nclass = No", fillcolor="#e58139"] ;
+8 -> 12 ;
+}
