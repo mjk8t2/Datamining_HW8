@@ -1,16 +1,12 @@
-## TODO:
-
-- In order to do association rule mining, we have to:
-  - ~~Write a program to convert continuous attributes into binary nominal attributes~~ done
-  - ~~Then use weka to generate association rules~~
-  - ~~Use a regex to parse the association rules~~
+## Left to do 
+ - Tree depth : 2 + 5 , add these to report 
+ - Cross check tree and PRISM result for important attributes (AIT201 etc)
+ - Rerun Weka stuff and screen shot settings + include interesting results
+ - Gather accuracy of each weka test to pick for ensemble
+ - Ensemble in r and python just to compare
   - Use the parsed association rules to figure out which conditions should be dropped (clopper pearson or y1 y2 e1 e2) (need to do decision tree pruning)
-  - Document all Weka settings used as well as results from those models
-  - Build an ensemble classifier using the best methods we've found and use cross validation to avoid overfitting
   
 ### Reorganization of models
-- Kd tree - chau - use decision tree for -> adaBoost 
-  - weka
 - Clusterings - sujit
   - kmeans 
   - nearest neighbors
@@ -20,17 +16,7 @@
 - PRISM 
 - Baysian Networks
 - Ensemble
-- Cross validation
 
-### old list
-- PRISM? (weka can do this and use it in an ensemble classifier, but I don't think R can)
-  - Weka is advised for adaBoost rather than R - look into this
-- Clustering
-- SVMs
-- Decision Trees (kd tree)
-- Baysian Networks, if not too complicated
-- Ensemble of all models we've built so far
-- Cross validation on the ensemble models (or individual models if they turn out to be better than ensemble)
 
 ## NOTES FROM CLASS:
 
