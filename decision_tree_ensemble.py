@@ -71,35 +71,26 @@ for index, row in df.iterrows():
   natk_count %= num_folds
   yatk_count %= num_folds
 
-
-# print("Confusion matrices for {}".format(label))
-# all_conf_matrices = []
+avgerr = 0
 for key, val in folds.items():
+  print("Fold number {}".format(key+1))
   otherval = list(set(range(len(df))) - set(val)) # train on all the other data
   test = df.iloc[val]
   train = df.iloc[otherval]
-
-  # print("testlen", len(test))
-  # print(len(train))
-  # # s1 = pandas.merge(test, train, how='inner')
-  # # print(s1)
-  # # print(len(s1))
-  # # # train = df.drop(val, axis = 0)
-
-  
-  # # # print(len(val), len(othervals))
-  # # exit()
-
-  # # test.to_csv("test.csv")
-  # # train.to_csv("train.csv")
-
   Y_test, Y_train = test["is_attack"], train["is_attack"]
-  # cols = [column for column in df if df.nunique()[column] >= 4]
   X_test, X_train = test[cols].astype(float), train[cols].astype(float)
   clf = AdaBoostClassifier(DecisionTreeClassifier(max_depth = 4, min_samples_split=mss, min_samples_leaf=msl, criterion="gini"), n_estimators = 5, random_state = seed)
+  # clf = AdaBoostClassifier(DecisionTreeClassifier(max_depth = 1, criterion="gini"), n_estimators = 100, random_state = seed)
   clf.fit(X_train, Y_train)
-  conf = confusion_matrix(Y_test, clf.predict(X_test))
+  y_pred = clf.predict(X_test)
+  conf = confusion_matrix(Y_test, y_pred)
   print(conf)
+  avgerr += metrics.mean_absolute_error(Y_test, y_pred)
+  attribute_importances = sorted([(ii, jj) for ii, jj in zip(cols, clf.feature_importances_)], key = lambda x : x[1], reverse=True)
+  for att in attribute_importances:
+    print(att)
+avgerr /= num_folds
+print(avgerr)
 
 
 
